@@ -29,6 +29,7 @@
 #include "config_flash.h"
 
 #include "ext_SRAM2.h"
+#include "crypto_utils.h"
 
 //#define NPR_L476
 //Serial pc(SERIAL_TX, SERIAL_RX); // Nucleo
@@ -52,6 +53,36 @@ DigitalOut CS3(PB_0);// CS ext SRAM PB_0
 InterruptIn Int_SI4463(PA_3);
 DigitalOut CS2(PA_4);
 SPI spi_1(PA_7, PA_6, PA_5); // mosi, miso, sclk
+
+void update_crypto_keys(const char* new_key) {
+    // Function to update the crypto keys
+    set_crypto_key(new_key);
+
+	// Generate a new IV
+    uint8_t new_iv[16];
+    generate_crypto_key(new_iv, sizeof(new_iv));
+
+	// Update the IV
+    set_crypto_iv(new_iv, sizeof(new_iv));
+
+    HMI_printf("Crypto keys updated.\r\n");
+}
+
+void generate_new_crypto_keys() {
+    // Function to generate new crypto keys
+    char new_key[32];
+    generate_crypto_key(new_key, sizeof(new_key));
+    set_crypto_key(new_key);
+	// Generate a new IV
+    uint8_t new_iv[16];
+    generate_crypto_key(new_iv, sizeof(new_iv));
+
+	// Update the IV
+    set_crypto_iv(new_iv, sizeof(new_iv));
+	
+    HMI_printf("New crypto keys generated and updated.\r\n");
+    HMI_printf("New Key: %s\r\n", new_key); // Print the new key
+}
 
 int main()
 {
@@ -270,6 +301,18 @@ int main()
 			}
 		}
 		serial_term_loop();
+		
+		// Check for command to update crypto keys
+        if (serial_command_received("update_crypto_keys")) {
+            char new_key[32];
+            get_serial_command_argument(new_key, sizeof(new_key));
+            update_crypto_keys(new_key);
+        }
+        
+        // Check for command to generate new crypto keys
+        if (serial_command_received("generate_new_crypto_keys")) {
+            generate_new_crypto_keys();
+        }
 		
 		if ( (LAN_conf_applied.DHCP_server_active == 1) && (is_TDMA_master == 0) ) {
 			DHCP_server(LAN_conf_p, W5500_p1);
