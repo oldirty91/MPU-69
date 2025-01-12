@@ -1,6 +1,8 @@
 # MPU-69
 Under development as of Jan 2025. Please reach out if you'd like to help.
 
+![hardware](./mpu69_1.png)
+
 The MPU-69 is/will be an open source IP based MANET(Mobile Ad-hoc Network) system similiar to the mega-gucci MPU-5, but built for the poors. Obviously data rates and range will not be comparible. Ruggedized radio that can deliver more data than meshtestic is the goal. 
 
 The radio hardware will be built around an array (1-3) of affordable si4463 radio modules coupled to an MCU (likely NUCLEO) to provide radio control. This will first accomidate UHF 420-450mhz but will add other bands doiwn the road (2m, 800-900, 2.5g, etc)
